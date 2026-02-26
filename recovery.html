@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Neuro-Recovery</title>
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='20' fill='%2316A085'/><text x='50%' y='50%' font-family='Arial, sans-serif' font-size='50' font-weight='bold' fill='%23FFFFFF' dominant-baseline='central' text-anchor='middle'>CP</text></svg>">
+    <style>
+        :root { --recovery: #16A085; --bg: #F8F9FA; --box: #FFFFFF; --text: #333; }
+        body { font-family: sans-serif; background: var(--bg); color: var(--text); display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; user-select: none; }
+        .container { background: var(--box); max-width: 600px; width: 100%; padding: 40px; border-radius: 8px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); text-align: center; }
+        .rec-title { color: var(--recovery); font-size: 2rem; margin-bottom: 10px; }
+        .rec-desc { font-size: 1.2rem; color: #555; margin-bottom: 30px; line-height: 1.5; min-height: 80px;}
+        .rec-timer { font-size: 5rem; font-weight: bold; color: var(--recovery); margin: 20px 0; font-family: monospace; }
+        .anim-container { width: 100%; height: 150px; background: #ecf0f1; border-radius: 8px; margin-bottom: 30px; display: flex; justify-content: center; align-items: center; position: relative; overflow: hidden; }
+        
+        button.control-btn { background-color: var(--recovery); color: white; font-size: 1.2rem; padding: 15px 40px; border: none; border-radius: 6px; cursor: pointer; font-weight: bold; }
+        button.skip-btn { background-color: #95a5a6; color: white; font-size: 1rem; padding: 10px 20px; border: none; border-radius: 6px; cursor: pointer; margin-top: 10px;}
+
+        /* Animations */
+        .palm-hand { width: 60px; height: 80px; background: #333; border-radius: 30px; position: absolute; opacity: 0.8; animation: palmPulse 4s infinite; }
+        .palm-l { left: 35%; transform: rotate(-20deg); }
+        .palm-r { right: 35%; transform: rotate(20deg); }
+        @keyframes palmPulse { 0%, 100% { transform: scale(1) rotate(var(--rot)); opacity: 0.8; } 50% { transform: scale(1.05) rotate(var(--rot)); opacity: 0.95; } }
+        .relax-breath { width: 60px; height: 60px; background: var(--recovery); border-radius: 50%; animation: relaxBreathe 19s infinite ease-in-out; opacity: 0.6; }
+        @keyframes relaxBreathe { 0% { transform: scale(1); } 20% { transform: scale(2); } 55% { transform: scale(2); } 100% { transform: scale(1); } }
+        .dist-gaze { width: 10px; height: 10px; background: var(--recovery); border-radius: 50%; animation: gazeFar 5s infinite; }
+        @keyframes gazeFar { 0%, 100% { transform: scale(1); opacity: 1; } 50% { transform: scale(0.2); opacity: 0.2; } }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2 class="rec-title" id="rec-title">Titel</h2>
+        <div class="anim-container" id="rec-anim"></div>
+        <div class="rec-desc" id="rec-desc">Beschreibung</div>
+        
+        <div id="rec-intro-ui">
+            <button class="control-btn" onclick="startTimer()">ENTSPANNUNG STARTEN</button><br><br>
+            <button class="skip-btn" onclick="window.location.href='index.html'">Zurück zum Dashboard</button>
+        </div>
+        
+        <div id="rec-active-ui" style="display: none;">
+            <div class="rec-timer" id="rec-timer">00.0</div>
+            <button class="skip-btn" onclick="skip()">Überspringen</button>
+        </div>
+    </div>
+
+    <script>
+        const recoveries = [
+            { title: "1. Palming", desc: "Reibe deine Handflächen bis sie warm sind. Lege sie sanft über die geschlossenen Augen. Genieße die totale Dunkelheit.", time: 60, html: "<div class='palm-hand palm-l' style='--rot:-20deg'></div><div class='palm-hand palm-r' style='--rot:20deg'></div>" },
+            { title: "2. 4-7-8 Atmung", desc: "Atme 4s durch die Nase ein. Halte 7s. Atme 8s geräuschvoll durch den Mund aus. Senkt den Puls sofort.", time: 90, html: "<div class='relax-breath'></div>" },
+            { title: "3. Distant Gazing", desc: "Schaue aus dem Fenster oder in die fernste Ecke des Raumes. Fixiere keinen Punkt, lass den Blick weich werden.", time: 60, html: "<div class='dist-gaze'></div>" },
+            { title: "4. Nacken-Release", desc: "Neige das rechte Ohr zur rechten Schulter. Halte. Dann die andere Seite. Löse die Spannung vom Bildschirmstarren.", time: 60, html: "<div style='font-size:5rem;'>🧘</div>" }
+        ];
+
+        let currentIndex = 0; let timerInterval; let timeLeft = 0; let audioCtx;
+
+        function initAudio() {
+            if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+            if (audioCtx.state === 'suspended') audioCtx.resume();
+        }
+
+        function playGong() {
+            if(!audioCtx) return;
+            const t = audioCtx.currentTime;
+            const playOsc = (freq) => {
+                const osc = audioCtx.createOscillator();
+                const gain = audioCtx.createGain();
+                osc.type = 'sine'; osc.frequency.setValueAtTime(freq, t);
+                gain.gain.setValueAtTime(0, t); gain.gain.linearRampToValueAtTime(0.8, t + 0.1);
+                gain.gain.exponentialRampToValueAtTime(0.001, t + 4);
+                osc.connect(gain); gain.connect(audioCtx.destination);
+                osc.start(t); osc.stop(t + 4);
+            };
+            playOsc(432); playOsc(436); // Tibetischer Bowl Effekt
+        }
+
+        function loadIntro() {
+            if(currentIndex >= recoveries.length) { window.location.href='index.html'; return; }
+            const rec = recoveries[currentIndex];
+            document.getElementById('rec-title').innerText = rec.title;
+            document.getElementById('rec-desc').innerText = rec.desc;
+            document.getElementById('rec-anim').innerHTML = rec.html;
+            document.getElementById('rec-intro-ui').style.display = 'block';
+            document.getElementById('rec-active-ui').style.display = 'none';
+        }
+
+        function startTimer() {
+            initAudio();
+            document.getElementById('rec-intro-ui').style.display = 'none';
+            document.getElementById('rec-active-ui').style.display = 'block';
+            timeLeft = recoveries[currentIndex].time;
+            document.getElementById('rec-timer').innerText = timeLeft.toFixed(1);
+            clearInterval(timerInterval);
+            timerInterval = setInterval(() => {
+                timeLeft -= 0.1;
+                if(timeLeft <= 0) { 
+                    clearInterval(timerInterval); 
+                    playGong(); // GONG!
+                    currentIndex++; loadIntro(); 
+                } 
+                else { document.getElementById('rec-timer').innerText = timeLeft.toFixed(1); }
+            }, 100);
+        }
+
+        function skip() { clearInterval(timerInterval); currentIndex++; loadIntro(); }
+        
+        loadIntro();
+    </script>
+</body>
+</html>
