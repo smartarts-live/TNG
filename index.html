@@ -3,7 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Thomas Assessment Master-Simulator</title>
+    <title>brain-TRAINer!</title>
+    
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='20' fill='%232C3E50'/><text x='50%' y='50%' font-family='Arial, sans-serif' font-size='50' font-weight='bold' fill='%23FFFFFF' dominant-baseline='central' text-anchor='middle'>CP</text></svg>">
+
     <style>
         :root {
             --primary: #2C3E50;
@@ -28,6 +31,25 @@
             margin: 0;
             padding: 20px;
             user-select: none;
+            position: relative;
+        }
+
+        /* Profilbild Signatur Oben Rechts */
+        .profile-signature {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            border: 3px solid var(--box);
+            box-shadow: 0 4px 10px rgba(0,0,0,0.15);
+            object-fit: cover;
+            z-index: 1000;
+            transition: transform 0.2s;
+        }
+        .profile-signature:hover {
+            transform: scale(1.1);
         }
 
         .container {
@@ -156,10 +178,12 @@
 </head>
 <body>
 
+    <img src="painted.jpg" alt="Constantin Paul" class="profile-signature" onerror="this.style.display='none'">
+
     <div class="container">
         
         <div id="start-screen">
-            <h1>Assessment Master-Simulator</h1>
+            <h1>brain-TRAINer!</h1>
             <p class="instruction">
                 Wähle dein Trainingsmodul. Bereite dich systematisch auf das Verhaltenprofil (PPA) und die kognitiven Leistungstests (GIA) vor.
             </p>
@@ -365,7 +389,6 @@
             });
             container.appendChild(div);
 
-            // Prevent selecting same row for most and least
             const radios = document.querySelectorAll('input[type="radio"]');
             radios.forEach(radio => {
                 radio.addEventListener('change', function() {
@@ -389,7 +412,6 @@
                 return;
             }
 
-            // Scoring
             ppaScores[most.value] += 1;
             ppaScores[least.value] -= 1;
 
@@ -401,7 +423,6 @@
         function endPPA() {
             showScreen('ppa-result-area');
             
-            // Generate Profile string (e.g., High D, High G)
             let analysis = `<strong>Deine Auswertung (Werte zwischen -10 und +10):</strong><br>`;
             analysis += `Dominanz (D): ${ppaScores.D} <br>`;
             analysis += `Initiative (I): ${ppaScores.I} <br>`;
@@ -430,14 +451,13 @@
             "Sequenzielle Mathematik", "Richtungs-Logik", "Daten-Abgleich", "Kategorien-Ausschluss"
         ];
 
-        let mode = 'sprint'; // 'sprint' or 'marathon'
+        let mode = 'sprint'; 
         let currentRound = 1;
         let testTimerInterval;
         const timeLimit = 15;
         let timeLeft = timeLimit;
         
-        // Marathon specifics
-        let globalTimeLeft = 900; // 15 mins
+        let globalTimeLeft = 900; 
         let globalTimerInterval;
 
         let questionStartTime;
@@ -446,7 +466,6 @@
         
         let analytics = {};
 
-        // Data Pools
         const wordGroups = [
             { syns: ["Steuern", "Lenken", "Leiten", "Führen"], ants: ["Folgen", "Gehorchen"] },
             { syns: ["Effizient", "Rationell", "Wirtschaftlich", "Produktiv"], ants: ["Umständlich", "Ineffizient"] },
@@ -465,7 +484,6 @@
             showScreen('question-area');
             document.getElementById('timer-container').style.display = 'block';
             
-            // Init Analytics
             analytics = {};
             for(let i=0; i<16; i++) { analytics[i] = { attempts: 0, correct: 0, time: 0 }; }
 
@@ -678,7 +696,7 @@
             if (timeLeft <= 0) {
                 clearInterval(testTimerInterval);
                 analytics[type].attempts++;
-                analytics[type].time += timeLimit; // max time taken
+                analytics[type].time += timeLimit; 
                 currentRound++;
                 generateQuestion(); 
             }
@@ -721,9 +739,7 @@
                     let avgT = (stat.time / stat.attempts).toFixed(1);
                     
                     let tr = document.createElement('tr');
-                    // Highlight weaknesses (Accuracy < 70% or Time > 8s)
                     if(acc < 70 || avgT > 8.0) tr.className = 'weakness';
-                    // Highlight strengths (Accuracy 100% and Time < 5s)
                     else if(acc === 100 && avgT < 5.0) tr.className = 'strength';
 
                     tr.innerHTML = `
