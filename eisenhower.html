@@ -1,0 +1,321 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>brain-TRAINer! - Postkorb</title>
+    
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='20' fill='%23E67E22'/><text x='50%' y='50%' font-family='Arial, sans-serif' font-size='50' font-weight='bold' fill='%23FFFFFF' dominant-baseline='central' text-anchor='middle'>CP</text></svg>">
+
+    <style>
+        :root {
+            --primary: #2C3E50;
+            --bg: #F8F9FA;
+            --box: #FFFFFF;
+            --text: #333333;
+            --do: #E74C3C;       /* Rot für Sofort */
+            --schedule: #3498DB; /* Blau für Einplanen */
+            --delegate: #F39C12; /* Orange für Delegieren */
+            --delete: #95A5A6;   /* Grau für Ignorieren */
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--bg);
+            color: var(--text);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            padding: 20px;
+            user-select: none;
+        }
+
+        .container {
+            background-color: var(--box);
+            width: 100%;
+            max-width: 800px;
+            padding: 40px;
+            border-radius: 8px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            text-align: center;
+        }
+
+        h1 { color: #E67E22; margin-top: 0; }
+        p.instruction { font-size: 1.1rem; color: #666; margin-bottom: 30px; line-height: 1.5; }
+
+        .status-bar {
+            display: flex;
+            justify-content: space-between;
+            font-weight: bold;
+            color: #7f8c8d;
+            margin-bottom: 20px;
+            font-size: 1.2rem;
+            background: #ecf0f1;
+            padding: 10px 20px;
+            border-radius: 6px;
+        }
+
+        /* Scenario Box */
+        .scenario-box {
+            background: #fdfefe;
+            border-left: 6px solid var(--primary);
+            padding: 30px;
+            font-size: 1.4rem;
+            font-weight: 600;
+            color: var(--primary);
+            margin-bottom: 30px;
+            border-radius: 4px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+            min-height: 120px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: left;
+        }
+
+        /* Matrix Grid */
+        .matrix-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+        }
+
+        button.matrix-btn {
+            padding: 20px;
+            font-size: 1.3rem;
+            font-weight: bold;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: transform 0.1s, opacity 0.2s;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 5px;
+        }
+        button.matrix-btn:active { transform: scale(0.98); }
+        button.matrix-btn:hover { opacity: 0.9; }
+
+        .btn-do { background-color: var(--do); }
+        .btn-schedule { background-color: var(--schedule); }
+        .btn-delegate { background-color: var(--delegate); }
+        .btn-delete { background-color: var(--delete); }
+
+        .btn-subtext { font-size: 0.8rem; font-weight: normal; opacity: 0.9; }
+
+        button.control-btn {
+            background-color: var(--primary);
+            color: white;
+            font-size: 1.2rem;
+            padding: 15px 40px;
+            border: none;
+            border-radius: 6px;
+            margin-top: 30px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+        button.control-btn:hover { background-color: #1a252f; }
+
+        #test-area, #result-area { display: none; }
+
+        .score-circle {
+            width: 120px; height: 120px; border-radius: 50%;
+            background: #E67E22; color: white;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 2.5rem; font-weight: bold; margin: 0 auto 20px auto;
+        }
+
+        .feedback-text { text-align: left; font-size: 1.1rem; line-height: 1.6; color: #444; }
+
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        
+        <div id="start-screen">
+            <h1>Eisenhower-Postkorb</h1>
+            <p class="instruction">
+                Als Operations Manager prasseln täglich zig Anfragen auf dich ein.<br>
+                Ordne die folgenden 10 Szenarien sofort der richtigen Kategorie zu:
+            </p>
+            <ul style="text-align:left; color:#555; font-size:1.1rem; margin-bottom:30px; line-height:1.6;">
+                <li><strong>🔴 Sofort:</strong> Wichtig & Dringend (Krisen, Eskalationen)</li>
+                <li><strong>🔵 Einplanen:</strong> Wichtig, nicht Dringend (Strategie, Planung)</li>
+                <li><strong>🟠 Delegieren:</strong> Dringend, nicht Wichtig (Routinen, Service-Anfragen)</li>
+                <li><strong>⚪ Ignorieren:</strong> Weder noch (Spam, Ablenkungen)</li>
+            </ul>
+            <button class="control-btn" style="background:#E67E22;" onclick="startTest()">ÜBUNG STARTEN</button>
+            <button class="control-btn" style="background:#95A5A6; margin-left:10px;" onclick="window.location.href='index.html'">ZURÜCK</button>
+        </div>
+
+        <div id="test-area">
+            <div class="status-bar">
+                <span id="round-counter">Szenario: 1 / 10</span>
+                <span>Priorisierung</span>
+            </div>
+
+            <div class="scenario-box" id="scenario-text">Lädt...</div>
+
+            <div class="matrix-grid">
+                <button class="matrix-btn btn-do" onclick="handleAnswer('do')">
+                    SOFORT ERLEDIGEN
+                    <span class="btn-subtext">(Wichtig & Dringend)</span>
+                </button>
+                <button class="matrix-btn btn-schedule" onclick="handleAnswer('schedule')">
+                    EINPLANEN
+                    <span class="btn-subtext">(Wichtig, nicht Dringend)</span>
+                </button>
+                <button class="matrix-btn btn-delegate" onclick="handleAnswer('delegate')">
+                    DELEGIEREN
+                    <span class="btn-subtext">(Dringend, nicht Wichtig)</span>
+                </button>
+                <button class="matrix-btn btn-delete" onclick="handleAnswer('delete')">
+                    IGNORIEREN / PAPIERKORB
+                    <span class="btn-subtext">(Weder Wichtig noch Dringend)</span>
+                </button>
+            </div>
+        </div>
+
+        <div id="result-area">
+            <h1>Management Feedback</h1>
+            <div class="score-circle" id="score-display">0%</div>
+            <div class="feedback-text" id="feedback-display"></div>
+            <button class="control-btn" onclick="window.location.href='index.html'">ZURÜCK ZUM DASHBOARD</button>
+        </div>
+
+    </div>
+
+    <script>
+        const scenarios = [
+            {
+                text: "Totalausfall der Hauptkühlzelle für Medikamente und sensible Lebensmittel. Die Temperatur steigt bereits.",
+                ans: "do",
+                reason: "Absolute Krise. Betriebsgefahr. Muss sofort von dir gesteuert werden."
+            },
+            {
+                text: "Die Auswertung der Patientenzufriedenheit für das letzte Quartal ist da und muss für das Management-Board am Monatsende aufbereitet werden.",
+                ans: "schedule",
+                reason: "Strategisch sehr wichtig, aber nicht auf die Minute dringend. Feste Zeit dafür blocken."
+            },
+            {
+                text: "Ein aufgebrachter Privatpatient auf Station 3 verlangt sofort ein zweites Kopfkissen und beschwert sich lautstark über das Personal.",
+                ans: "delegate",
+                reason: "Dringend für den Gast, aber nicht wichtig genug für das Level eines Operations Managers. Ab an die Stationsleitung oder Housekeeping."
+            },
+            {
+                text: "Im abteilungsübergreifenden Teamchat entbrennt eine hitzige, nicht arbeitsrelevante Diskussion über das Menü für die kommende Sommerfeier.",
+                ans: "delete",
+                reason: "Reine Zeitverschwendung im Tagesgeschäft. Später lesen oder komplett ignorieren."
+            },
+            {
+                text: "Zwei deiner Abteilungsleiter streiten sich lautstark und aggressiv vor Patienten und Gästen im Hauptkorridor.",
+                ans: "do",
+                reason: "Reputationsverlust und Führungseskalation. Muss sofort in der Sekunde unterbunden werden."
+            },
+            {
+                text: "Das Budget für Personalentwicklungs-Maßnahmen im nächsten Halbjahr muss geplant und eingereicht werden.",
+                ans: "schedule",
+                reason: "Klassische Führungsaufgabe. Wichtig für die Zukunft, erfordert Deep-Work ohne Unterbrechung."
+            },
+            {
+                text: "Ein Lieferant für Standard-Büromaterial steht an der Laderampe und weiß nicht, wo er die Pakete für die Rezeption abladen soll.",
+                ans: "delegate",
+                reason: "Dringend (er steht da), aber eine absolute Standard-Routine. Delegieren an Logistik oder Empfang."
+            },
+            {
+                text: "Das Gesundheitsamt kündigt sich telefonisch für eine unangekündigte Hygiene-Prüfung in der Küche in 30 Minuten an.",
+                ans: "do",
+                reason: "Höchste Priorität. Du musst sofort den Küchenchef briefen und die Begleitung der Prüfer sicherstellen."
+            },
+            {
+                text: "Ein IT-Dienstleister schickt dir unaufgefordert eine Werbebroschüre für ein neues Buchungssystem, nach dem du nicht gesucht hast.",
+                ans: "delete",
+                reason: "Kaltakquise. Ablage P (Papierkorb)."
+            },
+            {
+                text: "Die Dienstpläne der Empfangsmitarbeiter für den übernächsten Monat müssen finalisiert und genehmigt werden.",
+                ans: "schedule",
+                reason: "Wichtige administrative Aufgabe, aber kein sofortiger Brandherd. Einplanen."
+            }
+        ];
+
+        // Shuffle the scenarios
+        scenarios.sort(() => 0.5 - Math.random());
+
+        let currentRound = 0;
+        let score = 0;
+        let mistakes = [];
+
+        function startTest() {
+            document.getElementById('start-screen').style.display = 'none';
+            document.getElementById('test-area').style.display = 'block';
+            currentRound = 0;
+            score = 0;
+            mistakes = [];
+            loadScenario();
+        }
+
+        function loadScenario() {
+            if (currentRound >= scenarios.length) {
+                endTest();
+                return;
+            }
+            document.getElementById('round-counter').innerText = `Szenario: ${currentRound + 1} / 10`;
+            document.getElementById('scenario-text').innerText = scenarios[currentRound].text;
+        }
+
+        function handleAnswer(selected) {
+            const correctAns = scenarios[currentRound].ans;
+            
+            if (selected === correctAns) {
+                score++;
+            } else {
+                mistakes.push({
+                    text: scenarios[currentRound].text,
+                    reason: scenarios[currentRound].reason
+                });
+            }
+            
+            currentRound++;
+            loadScenario();
+        }
+
+        function endTest() {
+            document.getElementById('test-area').style.display = 'none';
+            document.getElementById('result-area').style.display = 'block';
+
+            const percentage = Math.round((score / scenarios.length) * 100);
+            const circle = document.getElementById('score-display');
+            circle.innerText = `${percentage}%`;
+            
+            if(percentage >= 80) circle.style.background = 'var(--success)';
+            else if(percentage >= 50) circle.style.background = '#F39C12';
+            else circle.style.background = '#E74C3C';
+
+            let feedbackHTML = `<strong>Richtig priorisiert: ${score} von 10</strong><br><br>`;
+
+            if (percentage === 100) {
+                feedbackHTML += `Perfekt! Du hast den perfekten Kompass für das Operations Management. Du trennst messerscharf zwischen Mikromanagement, strategischer Führung und echter Eskalation.`;
+            } else if (percentage >= 70) {
+                feedbackHTML += `Sehr solide Leistung. Du delegierst gut und erkennst Krisen. Sieh dir unten an, wo du noch Optimierungspotenzial hast.`;
+            } else {
+                feedbackHTML += `Vorsicht: Du läufst Gefahr, dich im Mikromanagement zu verzetteln oder strategisch wichtige Aufgaben zu vernachlässigen. Trainiere die Eisenhower-Matrix weiter.`;
+            }
+
+            if (mistakes.length > 0) {
+                feedbackHTML += `<br><br><h3 style="color:var(--primary); margin-bottom:10px;">Deine Fehler-Analyse:</h3><ul style="padding-left:20px;">`;
+                mistakes.forEach(m => {
+                    feedbackHTML += `<li style="margin-bottom:10px;"><strong>Szenario:</strong> "${m.text}"<br><em>Lösung: ${m.reason}</em></li>`;
+                });
+                feedbackHTML += `</ul>`;
+            }
+
+            document.getElementById('feedback-display').innerHTML = feedbackHTML;
+        }
+    </script>
+</body>
+</html>
