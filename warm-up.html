@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Brain Warm-Up</title>
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='20' fill='%232980B9'/><text x='50%' y='50%' font-family='Arial, sans-serif' font-size='50' font-weight='bold' fill='%23FFFFFF' dominant-baseline='central' text-anchor='middle'>CP</text></svg>">
+    <style>
+        :root { --warmup: #2980B9; --bg: #F8F9FA; --box: #FFFFFF; --text: #333; }
+        body { font-family: sans-serif; background: var(--bg); color: var(--text); display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; user-select: none; }
+        .container { background: var(--box); max-width: 600px; width: 100%; padding: 40px; border-radius: 8px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); text-align: center; }
+        .warmup-title { color: var(--warmup); font-size: 2rem; margin-bottom: 10px; }
+        .warmup-desc { font-size: 1.2rem; color: #555; margin-bottom: 30px; line-height: 1.5; min-height: 80px;}
+        .warmup-timer { font-size: 5rem; font-weight: bold; color: var(--warmup); margin: 20px 0; font-family: monospace; }
+        .anim-container { width: 100%; height: 150px; background: #ecf0f1; border-radius: 8px; margin-bottom: 30px; display: flex; justify-content: center; align-items: center; position: relative; overflow: hidden; }
+        
+        button.control-btn { background-color: var(--warmup); color: white; font-size: 1.2rem; padding: 15px 40px; border: none; border-radius: 6px; cursor: pointer; font-weight: bold; }
+        button.skip-btn { background-color: #95a5a6; color: white; font-size: 1rem; padding: 10px 20px; border: none; border-radius: 6px; cursor: pointer; margin-top: 10px;}
+
+        /* Animations */
+        .drop { width: 20px; height: 20px; background: #3498DB; border-radius: 50% 50% 5px 50%; transform: rotate(-45deg); animation: fall 1.5s infinite; }
+        @keyframes fall { 0% { transform: translateY(-50px) rotate(-45deg); opacity: 0; } 50% { opacity: 1; } 100% { transform: translateY(50px) rotate(-45deg); opacity: 0; } }
+        .cross-l, .cross-r { width: 30px; height: 30px; border-radius: 50%; position: absolute; }
+        .cross-l { background: #E74C3C; left: 30%; animation: pulseLeft 2s infinite; }
+        .cross-r { background: var(--warmup); right: 30%; animation: pulseRight 2s infinite; }
+        @keyframes pulseLeft { 0%, 100% { transform: scale(1); opacity: 0.3; } 50% { transform: scale(1.5); opacity: 1; } }
+        @keyframes pulseRight { 0%, 100% { transform: scale(1.5); opacity: 1; } 50% { transform: scale(1); opacity: 0.3; } }
+        .saccade-dot { width: 25px; height: 25px; background: var(--warmup); border-radius: 50%; position: absolute; animation: dart 1s infinite steps(2, end); }
+        @keyframes dart { 0% { left: 20%; } 100% { left: 80%; } }
+        .breathe-box { width: 50px; height: 50px; border: 4px solid var(--warmup); border-radius: 50%; animation: breathe 16s infinite linear; }
+        @keyframes breathe { 0%, 100% { transform: scale(1); } 25% { transform: scale(2.5); } 50% { transform: scale(2.5); } 75% { transform: scale(1); } }
+        .peri-center { width: 15px; height: 15px; background: #333; border-radius: 50%; }
+        .peri-l, .peri-r { width: 15px; height: 15px; background: #E74C3C; border-radius: 50%; position: absolute; animation: expand 4s infinite alternate ease-in-out; }
+        @keyframes expand { 0% { left: 40%; right: 40%; } 100% { left: 5%; right: 5%; } }
+        .tap-l, .tap-r { width: 40px; height: 40px; border-radius: 8px; position: absolute; transition: all 0.3s; }
+        .tap-l { left: 35%; background: #2C3E50; animation: tapFlipL 2s infinite; }
+        .tap-r { right: 35%; background: #95a5a6; animation: tapFlipR 2s infinite; }
+        @keyframes tapFlipL { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-20px); } }
+        @keyframes tapFlipR { 0%, 100% { transform: translateY(-20px); } 50% { transform: translateY(0); } }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2 class="warmup-title" id="wu-title">Titel</h2>
+        <div class="anim-container" id="wu-anim"></div>
+        <div class="warmup-desc" id="wu-desc">Beschreibung</div>
+        
+        <div id="wu-intro-ui">
+            <button class="control-btn" onclick="startTimer()">ÜBUNG STARTEN</button><br><br>
+            <button class="skip-btn" onclick="window.location.href='index.html'">Zurück zum Dashboard</button>
+        </div>
+        
+        <div id="wu-active-ui" style="display: none;">
+            <div class="warmup-timer" id="wu-timer">00.0</div>
+            <button class="skip-btn" onclick="skip()">Überspringen</button>
+        </div>
+    </div>
+
+    <script>
+        const warmups = [
+            { title: "1. System-Reset", desc: "Wasche dir das Gesicht mit eiskaltem Wasser. Löst den Tauchreflex aus und bringt Adrenalin.", time: 30, html: "<div class='drop'></div>" },
+            { title: "2. Überkreuz-Koordination", desc: "Berühre abwechselnd mit dem rechten Ellbogen das linke Knie und umgekehrt. Zwingt beide Gehirnhälften zur Synchronisation.", time: 60, html: "<div class='cross-l'></div><div class='cross-r'></div>" },
+            { title: "3. Visuelle Sakkaden", desc: "Kopf stillhalten. Springe mit den Augen extrem schnell zwischen den Rändern des Blickfelds hin und her.", time: 30, html: "<div class='saccade-dot'></div>" },
+            { title: "4. Box-Atmung", desc: "4s einatmen, 4s halten, 4s ausatmen, 4s halten. Senkt Cortisol.", time: 60, html: "<div class='breathe-box'></div>" },
+            { title: "5. Peripheres Sehen", desc: "Fixiere die Mitte. Nimm Bewegungen an den Rändern wahr, ohne die Augen zu bewegen.", time: 30, html: "<div class='peri-l'></div><div class='peri-center'></div><div class='peri-r'></div>" },
+            { title: "6. Finger-Tapping", desc: "Linke Hand Daumen hoch, rechte Hand kleiner Finger raus. Dann gleichzeitig wechseln.", time: 60, html: "<div class='tap-l'></div><div class='tap-r'></div>" }
+        ];
+
+        let currentIndex = 0; let timerInterval; let timeLeft = 0; let audioCtx;
+
+        function initAudio() {
+            if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+            if (audioCtx.state === 'suspended') audioCtx.resume();
+        }
+
+        // Der synthetische Zen-Gong
+        function playGong() {
+            if(!audioCtx) return;
+            const t = audioCtx.currentTime;
+            
+            const playOsc = (freq) => {
+                const osc = audioCtx.createOscillator();
+                const gain = audioCtx.createGain();
+                osc.type = 'sine';
+                osc.frequency.setValueAtTime(freq, t);
+                gain.gain.setValueAtTime(0, t);
+                gain.gain.linearRampToValueAtTime(0.8, t + 0.1); // Weicher Attack
+                gain.gain.exponentialRampToValueAtTime(0.001, t + 4); // Langes Ausklingen
+                osc.connect(gain); gain.connect(audioCtx.destination);
+                osc.start(t); osc.stop(t + 4);
+            };
+            
+            playOsc(432); // Heilungs-Frequenz Basis
+            playOsc(436); // Leichte Verstimmung (Schwebung/Gong-Effekt)
+        }
+
+        function loadIntro() {
+            if(currentIndex >= warmups.length) { window.location.href='index.html'; return; }
+            const wu = warmups[currentIndex];
+            document.getElementById('wu-title').innerText = wu.title;
+            document.getElementById('wu-desc').innerText = wu.desc;
+            document.getElementById('wu-anim').innerHTML = wu.html;
+            document.getElementById('wu-intro-ui').style.display = 'block';
+            document.getElementById('wu-active-ui').style.display = 'none';
+        }
+
+        function startTimer() {
+            initAudio(); // Weckt das Audio-System
+            document.getElementById('wu-intro-ui').style.display = 'none';
+            document.getElementById('wu-active-ui').style.display = 'block';
+            timeLeft = warmups[currentIndex].time;
+            document.getElementById('wu-timer').innerText = timeLeft.toFixed(1);
+            clearInterval(timerInterval);
+            timerInterval = setInterval(() => {
+                timeLeft -= 0.1;
+                if(timeLeft <= 0) { 
+                    clearInterval(timerInterval); 
+                    playGong(); // TERTÖNT WENN ZEIT UM IST
+                    currentIndex++; 
+                    loadIntro(); 
+                } 
+                else { document.getElementById('wu-timer').innerText = timeLeft.toFixed(1); }
+            }, 100);
+        }
+
+        function skip() { clearInterval(timerInterval); currentIndex++; loadIntro(); }
+        
+        loadIntro(); // Start App
+    </script>
+</body>
+</html>
