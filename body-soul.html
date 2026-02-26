@@ -1,0 +1,354 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>brain-TRAINer! - Body & Soul</title>
+    
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='20' fill='%231ABC9C'/><text x='50%' y='50%' font-family='Arial, sans-serif' font-size='50' font-weight='bold' fill='%23FFFFFF' dominant-baseline='central' text-anchor='middle'>CP</text></svg>">
+
+    <style>
+        :root {
+            --primary: #2C3E50;
+            --bg: #1A252F; /* Dunkler, beruhigender Hintergrund */
+            --box: #243447;
+            --text: #ECF0F1;
+            --mint: #1ABC9C;
+            --mint-glow: rgba(26, 188, 156, 0.3);
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--bg);
+            color: var(--text);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            padding: 20px;
+            user-select: none;
+            overflow: hidden;
+        }
+
+        .container {
+            background-color: var(--box);
+            width: 100%;
+            max-width: 700px;
+            padding: 50px;
+            border-radius: 12px;
+            box-shadow: 0 15px 40px rgba(0,0,0,0.3);
+            text-align: center;
+            position: relative;
+        }
+
+        h1 { color: var(--mint); margin-top: 0; font-size: 2.2rem; }
+        p.instruction { font-size: 1.2rem; color: #BDC3C7; margin-bottom: 40px; line-height: 1.6; }
+
+        /* Buttons */
+        button.control-btn {
+            background-color: var(--mint);
+            color: #1A252F;
+            font-size: 1.3rem;
+            padding: 18px 50px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: all 0.2s;
+            box-shadow: 0 4px 15px var(--mint-glow);
+        }
+        button.control-btn:hover { transform: translateY(-2px); box-shadow: 0 6px 20px var(--mint-glow); }
+        
+        button.secondary-btn {
+            background-color: transparent;
+            border: 2px solid #7F8C8D;
+            color: #7F8C8D;
+            font-size: 1rem;
+            padding: 12px 30px;
+            border-radius: 6px;
+            cursor: pointer;
+            margin-top: 20px;
+            transition: all 0.2s;
+        }
+        button.secondary-btn:hover { border-color: var(--text); color: var(--text); }
+
+        /* Screens */
+        #active-screen, #done-screen { display: none; }
+
+        /* Visual Breathing Guide */
+        .breathing-container {
+            position: relative;
+            width: 250px;
+            height: 250px;
+            margin: 40px auto;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .breathing-circle {
+            width: 100px;
+            height: 100px;
+            background: radial-gradient(circle, var(--mint) 0%, transparent 80%);
+            border-radius: 50%;
+            opacity: 0.8;
+            /* 10 Sekunden Zyklus: 4s Einatmen (wächst), 6s Ausatmen (schrumpft) */
+            animation: breathe 10s infinite ease-in-out;
+            box-shadow: 0 0 40px var(--mint-glow);
+        }
+
+        @keyframes breathe {
+            0%   { transform: scale(1); opacity: 0.5; }
+            40%  { transform: scale(2.5); opacity: 1; } /* Nach 4 Sekunden voll eingeatmet */
+            100% { transform: scale(1); opacity: 0.5; } /* Nach weiteren 6 Sekunden ausgeatmet */
+        }
+
+        .breath-text {
+            position: absolute;
+            font-size: 1.2rem;
+            font-weight: bold;
+            color: #FFF;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.5);
+            animation: textFade 10s infinite ease-in-out;
+        }
+
+        @keyframes textFade {
+            0% { content: "Einatmen..."; opacity: 0.5; }
+            20% { opacity: 1; }
+            40% { content: "Ausatmen..."; opacity: 1; }
+            90% { opacity: 0.5; }
+            100% { content: "Einatmen..."; opacity: 0.5; }
+        }
+
+        /* Exercise Text */
+        .exercise-title {
+            font-size: 2rem;
+            font-weight: bold;
+            color: var(--mint);
+            margin-bottom: 10px;
+        }
+        .exercise-desc {
+            font-size: 1.2rem;
+            color: #ECF0F1;
+            line-height: 1.5;
+            min-height: 60px;
+            margin-bottom: 20px;
+        }
+
+        .timer-display {
+            font-size: 3rem;
+            font-family: monospace;
+            font-weight: bold;
+            color: #BDC3C7;
+            margin-bottom: 20px;
+        }
+
+        /* Progress Bar */
+        .progress-bar-bg {
+            width: 100%;
+            height: 6px;
+            background: #34495E;
+            border-radius: 3px;
+            overflow: hidden;
+            margin-top: 40px;
+        }
+        .progress-bar-fill {
+            height: 100%;
+            background: var(--mint);
+            width: 0%;
+            transition: width 1s linear;
+        }
+
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        
+        <div id="start-screen">
+            <h1>Body & Soul</h1>
+            <p class="instruction">
+                <strong>3-Minuten Biohacking-Session.</strong><br><br>
+                Der Browser generiert nun ein akustisches <em>Brown Noise</em> (Rauschen), um dich von der Außenwelt abzuschirmen.<br>
+                Folge den zufälligen Dehnübungen und passe deine Atmung dem pulsierenden Kreis an.
+            </p>
+            <button class="control-btn" onclick="startSession()">AUDIO & SESSION STARTEN</button>
+            <br>
+            <button class="secondary-btn" onclick="window.location.href='index.html'">Zurück zum Dashboard</button>
+        </div>
+
+        <div id="active-screen">
+            <div class="exercise-title" id="ex-title">Übung Lädt...</div>
+            <div class="exercise-desc" id="ex-desc">...</div>
+            
+            <div class="breathing-container">
+                <div class="breathing-circle"></div>
+                <div class="breath-text" id="breath-indicator">Einatmen...</div>
+            </div>
+
+            <div class="timer-display" id="ex-timer">30</div>
+
+            <div class="progress-bar-bg">
+                <div class="progress-bar-fill" id="progress-bar"></div>
+            </div>
+        </div>
+
+        <div id="done-screen">
+            <h1 style="font-size: 3rem;">Session Beendet</h1>
+            <p class="instruction">Dein Nervensystem ist kalibriert. Das Rauschen blendet aus.</p>
+            <p style="font-size: 2rem; color: var(--mint);" id="redirect-timer">Weiter in 3...</p>
+        </div>
+
+    </div>
+
+    <script>
+        // --- EXERCISE DATABASE ---
+        const allExercises = [
+            { title: "Nacken-Release", desc: "Rechtes Ohr sanft zur rechten Schulter neigen. Schultern tief lassen. Seitenwechsel nach halber Zeit." },
+            { title: "Brust-Öffner", desc: "Hände hinter dem Rücken verschränken, Brustkorb stolz nach vorne schieben. Blick leicht nach oben." },
+            { title: "Handgelenks-Dehnung", desc: "Einen Arm ausstrecken, Finger zeigen nach oben. Mit der anderen Hand die Finger sanft zum Körper ziehen." },
+            { title: "Schulter-Rollen", desc: "Schultern weit hoch zu den Ohren ziehen und kreisend nach hinten unten abrollen." },
+            { title: "Spinal Twist (Sitzend)", desc: "Im Sitzen: Linke Hand ans rechte Knie, Oberkörper nach rechts aufdrehen. Sanft atmen." },
+            { title: "Augen-Palming", desc: "Handflächen aneinander reiben bis sie warm sind. Geschlossen über die Augen legen. Dunkelheit genießen." },
+            { title: "Adler-Arme", desc: "Arme vor der Brust kreuzen (rechts über links) und Unterarme ineinander verschlingen. Ellbogen leicht anheben." },
+            { title: "Hüft-Öffner (Sitzend)", desc: "Rechten Knöchel auf das linke Knie legen. Mit geradem Rücken leicht nach vorne lehnen." }
+        ];
+
+        let sessionExercises = [];
+        let currentExIndex = 0;
+        let timeLeft = 30;
+        let exerciseTimer;
+        let breathTextInterval;
+
+        // --- WEB AUDIO API (BROWN NOISE SYNTHESIZER) ---
+        let audioCtx;
+        let noiseSource;
+        let gainNode;
+
+        function initAudio() {
+            const AudioContext = window.AudioContext || window.webkitAudioContext;
+            audioCtx = new AudioContext();
+
+            // Puffer für 2 Sekunden Audio (wird geloopt)
+            const bufferSize = audioCtx.sampleRate * 2;
+            const noiseBuffer = audioCtx.createBuffer(1, bufferSize, audioCtx.sampleRate);
+            const output = noiseBuffer.getChannelData(0);
+
+            // Brown Noise Algorithmus (Tiefpassfilter / Integriertes White Noise)
+            let lastOut = 0;
+            for (let i = 0; i < bufferSize; i++) {
+                let white = Math.random() * 2 - 1;
+                output[i] = (lastOut + (0.02 * white)) / 1.02;
+                lastOut = output[i];
+                output[i] *= 3.5; // Lautstärke-Kompensation, da Brown Noise oft leise wirkt
+            }
+
+            noiseSource = audioCtx.createBufferSource();
+            noiseSource.buffer = noiseBuffer;
+            noiseSource.loop = true;
+
+            gainNode = audioCtx.createGain();
+            gainNode.gain.setValueAtTime(0, audioCtx.currentTime); // Start stumm
+
+            noiseSource.connect(gainNode);
+            gainNode.connect(audioCtx.destination);
+
+            noiseSource.start();
+            // Sanftes Fade-In über 2 Sekunden
+            gainNode.gain.linearRampToValueAtTime(0.5, audioCtx.currentTime + 2);
+        }
+
+        function fadeOutAudio() {
+            if (gainNode) {
+                // Sanftes Fade-Out über 3 Sekunden
+                gainNode.gain.linearRampToValueAtTime(0.01, audioCtx.currentTime + 3);
+                setTimeout(() => {
+                    if(audioCtx) audioCtx.close();
+                }, 3100);
+            }
+        }
+
+        // --- SESSION LOGIC ---
+        function startSession() {
+            // Audio initialisieren (Muss durch User-Klick passieren!)
+            initAudio();
+
+            // UI umstellen
+            document.getElementById('start-screen').style.display = 'none';
+            document.getElementById('active-screen').style.display = 'block';
+
+            // Übungen mischen und 5 auswählen
+            const shuffled = [...allExercises].sort(() => 0.5 - Math.random());
+            sessionExercises = shuffled.slice(0, 5);
+
+            // Breath Text Animation Sync (4s in, 6s out)
+            const breathIndicator = document.getElementById('breath-indicator');
+            let isEinatmen = true;
+            breathIndicator.innerText = "Einatmen...";
+            breathTextInterval = setInterval(() => {
+                isEinatmen = !isEinatmen;
+                breathIndicator.innerText = isEinatmen ? "Einatmen..." : "Ausatmen...";
+            }, isEinatmen ? 4000 : 6000); // Dieser simple Timeout ist eine Annäherung an das CSS Keyframe
+
+            loadExercise();
+        }
+
+        function loadExercise() {
+            if (currentExIndex >= sessionExercises.length) {
+                endSession();
+                return;
+            }
+
+            const ex = sessionExercises[currentExIndex];
+            document.getElementById('ex-title').innerText = ex.title;
+            document.getElementById('ex-desc').innerText = ex.desc;
+            
+            timeLeft = 30; // 30 Sekunden pro Übung
+            document.getElementById('ex-timer').innerText = timeLeft;
+
+            updateProgressBar();
+
+            clearInterval(exerciseTimer);
+            exerciseTimer = setInterval(() => {
+                timeLeft--;
+                document.getElementById('ex-timer').innerText = timeLeft;
+                if (timeLeft <= 0) {
+                    clearInterval(exerciseTimer);
+                    currentExIndex++;
+                    loadExercise();
+                }
+            }, 1000);
+        }
+
+        function updateProgressBar() {
+            const total = sessionExercises.length;
+            const percentage = (currentExIndex / total) * 100;
+            document.getElementById('progress-bar').style.width = `${percentage}%`;
+        }
+
+        function endSession() {
+            clearInterval(exerciseTimer);
+            clearInterval(breathTextInterval);
+            document.getElementById('progress-bar').style.width = '100%';
+            
+            fadeOutAudio(); // Audio langsam leiser werden lassen
+
+            document.getElementById('active-screen').style.display = 'none';
+            document.getElementById('done-screen').style.display = 'block';
+
+            let redirectTime = 3;
+            const rtDisplay = document.getElementById('redirect-timer');
+            
+            let rtInterval = setInterval(() => {
+                redirectTime--;
+                rtDisplay.innerText = `Weiter in ${redirectTime}...`;
+                if(redirectTime <= 0) {
+                    clearInterval(rtInterval);
+                    window.location.href = 'index.html';
+                }
+            }, 1000);
+        }
+    </script>
+</body>
+</html>
