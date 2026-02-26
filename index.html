@@ -16,6 +16,7 @@
             --text: #333333;
             --success: #27AE60;
             --warmup: #2980B9;
+            --recovery: #16A085; /* NEU: Türkis für Entspannung */
             --ppa: #8E44AD;
             --marathon: #D35400;
         }
@@ -70,11 +71,11 @@
         /* Dashboard Grid */
         .dashboard-grid {
             display: grid;
-            grid-template-columns: 1fr 1fr;
+            grid-template-columns: 1fr 1fr; /* 2 Spalten */
             gap: 20px;
             margin-top: 30px;
         }
-
+        /* Full width card for specific items if needed, or keep grid */
         .dash-card {
             background: #f8f9fa;
             border: 2px solid #e9ecef;
@@ -100,6 +101,10 @@
         .card-wu h3 { color: var(--warmup); }
         .card-wu .dash-btn { background: var(--warmup); }
 
+        .card-rec { border-color: var(--recovery); }
+        .card-rec h3 { color: var(--recovery); }
+        .card-rec .dash-btn { background: var(--recovery); }
+
         .card-ppa { border-color: var(--ppa); }
         .card-ppa h3 { color: var(--ppa); }
         .card-ppa .dash-btn { background: var(--ppa); }
@@ -123,37 +128,61 @@
         .timer-container { width: 100%; height: 12px; background-color: #eee; border-radius: 6px; margin-bottom: 30px; overflow: hidden; display: none; }
         .timer-bar { height: 100%; width: 100%; background-color: var(--accent); transition: width 0.1s linear, background-color 0.3s; }
         
-        #question-area, #result-area, #warmup-area, #ppa-area, #ppa-result-area { display: none; }
+        #question-area, #result-area, #warmup-area, #recovery-area, #ppa-area, #ppa-result-area { display: none; }
         
         .question-text { font-size: 1.5rem; font-weight: 600; margin-bottom: 20px; color: var(--primary); min-height: 60px; }
         .data-display { font-size: 2.2rem; letter-spacing: 4px; margin-bottom: 30px; padding: 20px; background: #f0f4f8; border-radius: 8px; font-family: monospace; min-height: 40px; word-wrap: break-word; }
         .options-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
 
-        /* Warmup Animations */
+        /* Animation Containers */
+        .anim-container { width: 100%; height: 150px; background: #ecf0f1; border-radius: 8px; margin-bottom: 30px; display: flex; justify-content: center; align-items: center; position: relative; overflow: hidden; }
+        
+        /* Warmup Specifics */
         .warmup-title { color: var(--warmup); font-size: 1.8rem; margin-bottom: 10px; }
         .warmup-desc { font-size: 1.2rem; color: #555; margin-bottom: 30px; line-height: 1.5; min-height: 80px;}
         .warmup-timer { font-size: 4rem; font-weight: bold; color: var(--warmup); margin: 20px 0; font-family: monospace; }
-        .anim-container { width: 100%; height: 150px; background: #ecf0f1; border-radius: 8px; margin-bottom: 30px; display: flex; justify-content: center; align-items: center; position: relative; overflow: hidden; }
         
+        /* Recovery Specifics */
+        .recovery-title { color: var(--recovery); font-size: 1.8rem; margin-bottom: 10px; }
+        .recovery-timer { font-size: 4rem; font-weight: bold; color: var(--recovery); margin: 20px 0; font-family: monospace; }
+
+        /* Animations */
         .drop { width: 20px; height: 20px; background: #3498DB; border-radius: 50% 50% 5px 50%; transform: rotate(-45deg); animation: fall 1.5s infinite; }
         @keyframes fall { 0% { transform: translateY(-50px) rotate(-45deg); opacity: 0; } 50% { opacity: 1; } 100% { transform: translateY(50px) rotate(-45deg); opacity: 0; } }
+        
         .cross-l, .cross-r { width: 30px; height: 30px; border-radius: 50%; position: absolute; }
         .cross-l { background: #E74C3C; left: 30%; animation: pulseLeft 2s infinite; }
         .cross-r { background: #2980B9; right: 30%; animation: pulseRight 2s infinite; }
         @keyframes pulseLeft { 0%, 100% { transform: scale(1); opacity: 0.3; } 50% { transform: scale(1.5); opacity: 1; } }
         @keyframes pulseRight { 0%, 100% { transform: scale(1.5); opacity: 1; } 50% { transform: scale(1); opacity: 0.3; } }
+        
         .saccade-dot { width: 25px; height: 25px; background: var(--warmup); border-radius: 50%; position: absolute; animation: dart 1s infinite steps(2, end); }
         @keyframes dart { 0% { left: 20%; } 100% { left: 80%; } }
+        
         .breathe-box { width: 50px; height: 50px; border: 4px solid var(--warmup); border-radius: 50%; animation: breathe 16s infinite linear; }
         @keyframes breathe { 0%, 100% { transform: scale(1); } 25% { transform: scale(2.5); } 50% { transform: scale(2.5); } 75% { transform: scale(1); } }
+        
         .peri-center { width: 15px; height: 15px; background: #333; border-radius: 50%; }
         .peri-l, .peri-r { width: 15px; height: 15px; background: var(--accent); border-radius: 50%; position: absolute; animation: expand 4s infinite alternate ease-in-out; }
         @keyframes expand { 0% { left: 40%; right: 40%; } 100% { left: 5%; right: 5%; } }
+        
         .tap-l, .tap-r { width: 40px; height: 40px; border-radius: 8px; position: absolute; transition: all 0.3s; }
         .tap-l { left: 35%; background: var(--primary); animation: tapFlipL 2s infinite; }
         .tap-r { right: 35%; background: #95a5a6; animation: tapFlipR 2s infinite; }
         @keyframes tapFlipL { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-20px); } }
         @keyframes tapFlipR { 0%, 100% { transform: translateY(-20px); } 50% { transform: translateY(0); } }
+
+        /* Recovery Animations */
+        .palm-hand { width: 60px; height: 80px; background: #333; border-radius: 30px; position: absolute; opacity: 0.8; animation: palmPulse 4s infinite; }
+        .palm-l { left: 35%; transform: rotate(-20deg); }
+        .palm-r { right: 35%; transform: rotate(20deg); }
+        @keyframes palmPulse { 0%, 100% { transform: scale(1) rotate(var(--rot)); opacity: 0.8; } 50% { transform: scale(1.05) rotate(var(--rot)); opacity: 0.95; } }
+        
+        .relax-breath { width: 60px; height: 60px; background: var(--recovery); border-radius: 50%; animation: relaxBreathe 19s infinite ease-in-out; opacity: 0.6; }
+        @keyframes relaxBreathe { 0% { transform: scale(1); } 20% { transform: scale(2); } 55% { transform: scale(2); } 100% { transform: scale(1); } } /* 4-7-8 Pattern roughly */
+
+        .dist-gaze { width: 10px; height: 10px; background: var(--recovery); border-radius: 50%; animation: gazeFar 5s infinite; }
+        @keyframes gazeFar { 0%, 100% { transform: scale(1); opacity: 1; } 50% { transform: scale(0.2); opacity: 0.2; } }
 
         /* PPA Styles */
         .ppa-block { background: #f8f9fa; padding: 20px; border-radius: 8px; margin-bottom: 20px; text-align: left; border: 1px solid #ddd; }
@@ -191,22 +220,27 @@
             <div class="dashboard-grid">
                 <div class="dash-card card-wu" onclick="initWarmup()">
                     <h3>🧠 Brain Warm-Up</h3>
-                    <p>5-Minuten Neuro-Aktivierung. Bricht tiefe Lesemuster und weckt die visuelle Geschwindigkeit vor dem Test auf.</p>
+                    <p>5 Min. Aktivierung. Bricht tiefe Lesemuster und weckt die visuelle Geschwindigkeit.</p>
                     <button class="dash-btn">WARM-UP STARTEN</button>
+                </div>
+                <div class="dash-card card-rec" onclick="initRecovery()">
+                    <h3>🌿 Neuro-Recovery</h3>
+                    <p>4 Min. Cool-Down. Augen entspannen und Cortisol senken nach dem Sprint.</p>
+                    <button class="dash-btn">RECOVERY STARTEN</button>
                 </div>
                 <div class="dash-card card-ppa" onclick="startPPA()">
                     <h3>👤 PPA-Profiling</h3>
-                    <p>Verhaltens-Assessment (DISG). 10 Blöcke. Trainiere die "Am meisten / Am wenigsten" Forced-Choice Mechanik.</p>
+                    <p>Verhaltens-Assessment (DISG). Trainiere die Forced-Choice Mechanik.</p>
                     <button class="dash-btn">PROFILING STARTEN</button>
                 </div>
                 <div class="dash-card card-sprint" onclick="startTest('sprint')">
                     <h3>⚡ GIA Pro-Sprint</h3>
-                    <p>30 Aufgaben, harter Wechsel, 16 Typen. 15 Sekunden Limit. Inklusive Deep-Dive Schwachstellen-Radar.</p>
+                    <p>30 Aufgaben, 16 Typen. 15 Sekunden Limit. Mit Schwachstellen-Radar.</p>
                     <button class="dash-btn">SPRINT STARTEN</button>
                 </div>
                 <div class="dash-card card-marathon" onclick="startTest('marathon')">
                     <h3>🔥 GIA Marathon</h3>
-                    <p>15 Minuten Ausdauer pur. Simuliert die echte kognitive Erschöpfung des Assessments. Endlos viele Aufgaben.</p>
+                    <p>15 Minuten Ausdauer. Simuliert die echte kognitive Erschöpfung.</p>
                     <button class="dash-btn">MARATHON STARTEN</button>
                 </div>
             </div>
@@ -224,6 +258,21 @@
             <div id="wu-active-ui" style="display: none;">
                 <div class="warmup-timer" id="wu-timer">00.0</div>
                 <button class="control-btn" style="background: #95a5a6;" onclick="skipWarmup()">Überspringen</button>
+            </div>
+        </div>
+
+        <div id="recovery-area">
+            <h2 class="recovery-title" id="rec-title">Titel</h2>
+            <div class="anim-container" id="rec-anim"></div>
+            <div class="warmup-desc" id="rec-desc">Beschreibung</div>
+            
+            <div id="rec-intro-ui">
+                <button class="control-btn" style="background: var(--recovery);" onclick="startRecoveryTimer()">ENTSPANNUNG STARTEN</button>
+            </div>
+            
+            <div id="rec-active-ui" style="display: none;">
+                <div class="recovery-timer" id="rec-timer">00.0</div>
+                <button class="control-btn" style="background: #95a5a6;" onclick="skipRecovery()">Überspringen</button>
             </div>
         </div>
 
@@ -286,7 +335,7 @@
     <script>
         // GLOBALS
         function showScreen(id) {
-            ['start-screen', 'warmup-area', 'ppa-area', 'ppa-result-area', 'question-area', 'result-area'].forEach(el => {
+            ['start-screen', 'warmup-area', 'recovery-area', 'ppa-area', 'ppa-result-area', 'question-area', 'result-area'].forEach(el => {
                 document.getElementById(el).style.display = (el === id) ? 'block' : 'none';
             });
         }
@@ -303,12 +352,9 @@
             { title: "6. Finger-Tapping", desc: "Linke Hand Daumen hoch, rechte Hand kleiner Finger raus. Dann gleichzeitig wechseln.", time: 60, html: "<div class='tap-l'></div><div class='tap-r'></div>" }
         ];
 
-        let currentWuIndex = 0;
-        let wuTimerInterval;
-        let wuTimeLeft = 0;
+        let currentWuIndex = 0; let wuTimerInterval; let wuTimeLeft = 0;
 
         function initWarmup() { showScreen('warmup-area'); currentWuIndex = 0; loadWarmupIntro(); }
-
         function loadWarmupIntro() {
             if(currentWuIndex >= warmups.length) { showScreen('start-screen'); return; }
             const wu = warmups[currentWuIndex];
@@ -318,7 +364,6 @@
             document.getElementById('wu-intro-ui').style.display = 'block';
             document.getElementById('wu-active-ui').style.display = 'none';
         }
-
         function startWarmupTimer() {
             document.getElementById('wu-intro-ui').style.display = 'none';
             document.getElementById('wu-active-ui').style.display = 'block';
@@ -331,8 +376,43 @@
                 else { document.getElementById('wu-timer').innerText = wuTimeLeft.toFixed(1); }
             }, 100);
         }
-
         function skipWarmup() { clearInterval(wuTimerInterval); currentWuIndex++; loadWarmupIntro(); }
+
+        /* =========================================================
+           RECOVERY LOGIK (NEU)
+           ========================================================= */
+        const recoveries = [
+            { title: "1. Palming", desc: "Reibe deine Handflächen bis sie warm sind. Lege sie sanft über die geschlossenen Augen. Genieße die totale Dunkelheit.", time: 60, html: "<div class='palm-hand palm-l' style='--rot:-20deg'></div><div class='palm-hand palm-r' style='--rot:20deg'></div>" },
+            { title: "2. 4-7-8 Atmung", desc: "Atme 4s durch die Nase ein. Halte 7s. Atme 8s geräuschvoll durch den Mund aus. Senkt den Puls sofort.", time: 90, html: "<div class='relax-breath'></div>" },
+            { title: "3. Distant Gazing", desc: "Schaue aus dem Fenster oder in die fernste Ecke des Raumes. Fixiere keinen Punkt, lass den Blick weich werden.", time: 60, html: "<div class='dist-gaze'></div>" },
+            { title: "4. Nacken-Release", desc: "Neige das rechte Ohr zur rechten Schulter. Halte. Dann die andere Seite. Löse die Spannung vom Bildschirmstarren.", time: 60, html: "<div style='font-size:5rem;'>🧘</div>" }
+        ];
+
+        let currentRecIndex = 0; let recTimerInterval; let recTimeLeft = 0;
+
+        function initRecovery() { showScreen('recovery-area'); currentRecIndex = 0; loadRecIntro(); }
+        function loadRecIntro() {
+            if(currentRecIndex >= recoveries.length) { showScreen('start-screen'); return; }
+            const rec = recoveries[currentRecIndex];
+            document.getElementById('rec-title').innerText = rec.title;
+            document.getElementById('rec-desc').innerText = rec.desc;
+            document.getElementById('rec-anim').innerHTML = rec.html;
+            document.getElementById('rec-intro-ui').style.display = 'block';
+            document.getElementById('rec-active-ui').style.display = 'none';
+        }
+        function startRecoveryTimer() {
+            document.getElementById('rec-intro-ui').style.display = 'none';
+            document.getElementById('rec-active-ui').style.display = 'block';
+            recTimeLeft = recoveries[currentRecIndex].time;
+            document.getElementById('rec-timer').innerText = recTimeLeft.toFixed(1);
+            clearInterval(recTimerInterval);
+            recTimerInterval = setInterval(() => {
+                recTimeLeft -= 0.1;
+                if(recTimeLeft <= 0) { clearInterval(recTimerInterval); currentRecIndex++; loadRecIntro(); } 
+                else { document.getElementById('rec-timer').innerText = recTimeLeft.toFixed(1); }
+            }, 100);
+        }
+        function skipRecovery() { clearInterval(recTimerInterval); currentRecIndex++; loadRecIntro(); }
 
         /* =========================================================
            PPA LOGIK (DISG)
