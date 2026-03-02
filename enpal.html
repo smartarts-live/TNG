@@ -3,18 +3,20 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Enpal Spickzettel</title>
+    <title>Enpal Spickzettel - Live</title>
 
     <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='20' fill='%2300B0F0'/><text x='50%' y='50%' font-family='Arial, sans-serif' font-size='50' font-weight='bold' fill='%23FFFFFF' dominant-baseline='central' text-anchor='middle'>CP</text></svg>">
 
     <style>
         :root {
             --primary: #2C3E50;
-            --accent: #E74C3C;
             --bg: #F8F9FA;
             --box: #FFFFFF;
             --text: #333333;
             --enpal: #00B0F0;
+            --b2b: #2980B9;
+            --b2c: #E67E22;
+            --success: #27AE60;
         }
 
         body {
@@ -37,7 +39,7 @@
         }
 
         h1 { color: var(--enpal); margin-top: 0; margin-bottom: 5px; }
-        .subtitle { color: #666; font-size: 1.1rem; margin-bottom: 30px; }
+        .subtitle { color: #666; font-size: 1.1rem; margin-bottom: 20px; }
 
         .live-clock {
             position: absolute;
@@ -53,20 +55,42 @@
             border: 2px solid #e9ecef;
         }
 
-        .spickzettel-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; text-align: left; }
-        @media (max-width: 768px) { .spickzettel-grid { grid-template-columns: 1fr; } .live-clock { position: relative; top: 0; right: 0; display: inline-block; margin-bottom: 20px; } }
+        /* Views */
+        .view-section { display: none; text-align: left; }
+        .view-active { display: block; animation: fadeIn 0.3s ease-in; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
 
-        .spickzettel-box { background: #f8f9fa; border-left: 5px solid; padding: 25px; border-radius: 4px; box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
-        .box-b2b { border-color: #2980B9; }
-        .box-b2c { border-color: #E67E22; }
-        .box-general { border-color: #27AE60; grid-column: 1 / -1; }
+        /* Grid für Startseite */
+        .spickzettel-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-top: 20px;}
         
-        .spickzettel-box h3 { margin-top: 0; color: var(--primary); border-bottom: 1px solid #ddd; padding-bottom: 10px; font-size: 1.4rem; }
+        /* Boxen Styling */
+        .spickzettel-box { background: #f8f9fa; border-left: 6px solid; padding: 25px; border-radius: 6px; box-shadow: 0 2px 8px rgba(0,0,0,0.08); position: relative;}
+        .box-b2b { border-color: var(--b2b); }
+        .box-b2c { border-color: var(--b2c); }
+        .box-questions { border-color: var(--success); margin-top: 20px;}
+        
+        .spickzettel-box h3 { margin-top: 0; color: var(--primary); border-bottom: 1px solid #ddd; padding-bottom: 10px; font-size: 1.5rem; }
         .spickzettel-box ul { padding-left: 20px; margin-bottom: 0; }
-        .spickzettel-box li { margin-bottom: 12px; line-height: 1.5; font-size: 1.05rem; }
+        .spickzettel-box li { margin-bottom: 12px; line-height: 1.5; font-size: 1.1rem; }
 
-        button.control-btn { background-color: var(--primary); color: white; font-size: 1.2rem; padding: 15px 40px; border: none; border-radius: 6px; margin-top: 40px; cursor: pointer; font-weight: bold; transition: background 0.2s; }
-        button.control-btn:hover { background-color: #1a252f; }
+        /* Buttons */
+        .focus-btn { width: 100%; padding: 15px; margin-top: 20px; border: none; border-radius: 6px; font-size: 1.1rem; font-weight: bold; color: white; cursor: pointer; transition: transform 0.2s; }
+        .focus-btn:hover { transform: scale(1.02); }
+        .btn-b2b { background-color: var(--b2b); }
+        .btn-b2c { background-color: var(--b2c); }
+
+        .switch-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; gap: 15px;}
+        .switch-btn { flex: 1; padding: 15px; font-size: 1.2rem; font-weight: bold; color: white; border: none; border-radius: 6px; cursor: pointer; box-shadow: 0 4px 6px rgba(0,0,0,0.1); transition: filter 0.2s;}
+        .switch-btn:hover { filter: brightness(1.1); }
+        
+        .home-btn { background-color: #95a5a6; color: white; padding: 10px 20px; border: none; border-radius: 6px; cursor: pointer; font-weight: bold; margin-top: 30px; font-size: 1.1rem;}
+        .home-btn:hover { background-color: #7f8c8d; }
+
+        @media (max-width: 768px) { 
+            .spickzettel-grid { grid-template-columns: 1fr; } 
+            .live-clock { position: relative; top: 0; right: 0; display: inline-block; margin-bottom: 10px; } 
+            .switch-header { flex-direction: column; }
+        }
     </style>
 </head>
 <body>
@@ -77,49 +101,117 @@
         <h1>Enpal Interview Strategie</h1>
         <div class="subtitle">Fokus auf Lösungskompetenz & Abschlussstärke</div>
 
-        <div class="spickzettel-grid">
-            
+        <div id="view-start" class="view-section view-active">
+            <div class="spickzettel-grid">
+                
+                <div class="spickzettel-box box-b2b">
+                    <h3>Fokus B2B (Handwerk)</h3>
+                    <ul>
+                        <li><strong>USP:</strong> "Bauleiter-Versteher" (Bonava).</li>
+                        <li><strong>Hebel:</strong> Zeitersparnis, Bürokratieabbau.</li>
+                        <li><strong>Stil:</strong> Consultative Selling & Hunter.</li>
+                        <li><strong>Einwand:</strong> Ineffizienzen bei alten Systemen aufzeigen.</li>
+                    </ul>
+                    <button class="focus-btn btn-b2b" onclick="switchView('view-b2b')">🎯 FOKUS: B2B ÖFFNEN</button>
+                </div>
+
+                <div class="spickzettel-box box-b2c">
+                    <h3>Fokus B2C (Endkunden / Joker)</h3>
+                    <ul>
+                        <li><strong>USP:</strong> "Gastgeber-Gen" (Hotellerie/Golf).</li>
+                        <li><strong>Hebel:</strong> Vertrauen & Sicherheit vermitteln.</li>
+                        <li><strong>Technik:</strong> Nutzen statt Fachjargon.</li>
+                        <li><strong>Einwand:</strong> "Zu teuer" -> Stromkosten einfrieren.</li>
+                    </ul>
+                    <button class="focus-btn btn-b2c" onclick="switchView('view-b2c')">🎯 FOKUS: B2C ÖFFNEN</button>
+                </div>
+
+            </div>
+            <div style="text-align: center;">
+                <button class="home-btn" onclick="window.location.href='index.html'">Zurück zum Dashboard</button>
+            </div>
+        </div>
+
+        <div id="view-b2b" class="view-section">
+            <div class="switch-header">
+                <button class="switch-btn btn-b2c" onclick="switchView('view-b2c')">🔁 NOTFALL-WECHSEL ZU B2C</button>
+            </div>
+
             <div class="spickzettel-box box-b2b">
-                <h3>Fokus B2B (Handwerk / Installateure)</h3>
+                <h3 style="color: var(--b2b);">[AKTIV] Argumente: B2B Inside Sales</h3>
                 <ul>
-                    <li><strong>Mein USP:</strong> "Bauleiter-Versteher" (Bonava Erfahrung). Ich kenne die Pain Points auf dem Bau.</li>
-                    <li><strong>Der Hebel:</strong> Zeitersparnis & weniger Bürokratie für den Installateur betonen.</li>
-                    <li><strong>Vertriebsstil:</strong> Consultative Selling. Ich berate nicht nur, ich "close" (Hunter-Mentalität).</li>
-                    <li><strong>Einwand:</strong> "Never change a running system" -> auflösen durch Aufzeigen von Ineffizienzen.</li>
+                    <li><strong>Mein USP:</strong> "Bauleiter-Versteher" (Bonava Erfahrung). Ich kenne die operativen Pain Points von Installateuren exakt.</li>
+                    <li><strong>Der Hebel:</strong> Enpal nimmt administrative Schmerzen ab. Zeitersparnis für das Handwerk betonen.</li>
+                    <li><strong>Vertriebsstil:</strong> Consultative Selling kombiniert mit Abschluss-Härte (Hunter-Mentalität).</li>
+                    <li><strong>Einwandbehandlung:</strong> "Never change a running system" -> Auflösen durch Fragen nach aktuellen Ineffizienzen und Engpässen.</li>
                 </ul>
+            </div>
+
+            <div class="spickzettel-box box-questions">
+                <h3 style="color: var(--success);">Meine Fragen an Enpal (B2B)</h3>
+                <ul>
+                    <li>1. "Was unterscheidet euren absolut besten <strong>B2B Sales Manager</strong> von den durchschnittlichen?"</li>
+                    <li>2. "Was ist aktuell der härteste Einwand der <strong>Handwerksbetriebe</strong> gegen eine Partnerschaft?"</li>
+                    <li>3. <strong>Closing-Move:</strong> "Gibt es basierend auf unserem heutigen Gespräch noch Zweifel an meinem Profil, die ich direkt hier und jetzt ausräumen kann?"</li>
+                </ul>
+            </div>
+            
+            <div style="text-align: center;">
+                <button class="home-btn" onclick="switchView('view-start')">🏠 Übersicht</button>
+            </div>
+        </div>
+
+        <div id="view-b2c" class="view-section">
+            <div class="switch-header">
+                <button class="switch-btn btn-b2b" onclick="switchView('view-b2b')">🔁 NOTFALL-WECHSEL ZU B2B</button>
             </div>
 
             <div class="spickzettel-box box-b2c">
-                <h3>Fokus B2C (Privatkunden / Joker)</h3>
+                <h3 style="color: var(--b2c);">[AKTIV] Argumente: B2C Endkunden</h3>
                 <ul>
-                    <li><strong>Mein USP:</strong> "Gastgeber-Gen" (Hotellerie Erfahrung). Empathie bei High-Ticket-Entscheidungen.</li>
-                    <li><strong>Der Hebel:</strong> Vertrauen & Sicherheit vermitteln (Angst vor Technik/Kosten nehmen).</li>
-                    <li><strong>Technik-Fokus:</strong> Komplexe Technik über den reinen Nutzen erklären (Schnittstellen-Erfahrung Bonava).</li>
-                    <li><strong>Einwand:</strong> "Zu teuer" -> in langfristigen Mehrwert übersetzen (Stromkosten einfrieren).</li>
+                    <li><strong>Mein USP:</strong> "Gastgeber-Gen" (Hotellerie/Golf Erfahrung). Empathie und Führung bei emotionalen High-Ticket-Entscheidungen.</li>
+                    <li><strong>Der Hebel:</strong> Dem Hausbesitzer Sicherheit geben, Vertrauen aufbauen, Angst vor Technik und Kosten nehmen.</li>
+                    <li><strong>Technik-Fokus:</strong> Komplexe Bauteile extrem simpel über den puren Nutzen erklären (Schnittstellen-Erfahrung Bonava).</li>
+                    <li><strong>Einwandbehandlung:</strong> "Zu teuer" -> Rate in Investition umwandeln ("Wir frieren heute Ihre Stromkosten für 20 Jahre ein").</li>
                 </ul>
             </div>
 
-            <div class="spickzettel-box box-general">
-                <h3>Meine Fragen an Charlotte (Am Ende des Calls)</h3>
+            <div class="spickzettel-box box-questions">
+                <h3 style="color: var(--success);">Meine Fragen an Enpal (B2C)</h3>
                 <ul>
-                    <li>1. "Was unterscheidet euren absolut besten Sales Manager von den durchschnittlichen?"</li>
-                    <li>2. "Was ist aktuell der härteste Einwand der Handwerksbetriebe (bzw. Endkunden)?"</li>
+                    <li>1. "Was unterscheidet euren absolut besten <strong>B2C Verkäufer</strong> am Telefon von den anderen?"</li>
+                    <li>2. "Was ist die größte Sorge der <strong>Hausbesitzer</strong> aktuell im Erstgespräch?"</li>
                     <li>3. <strong>Closing-Move:</strong> "Gibt es basierend auf unserem heutigen Gespräch noch Zweifel an meinem Profil, die ich direkt hier und jetzt ausräumen kann?"</li>
                 </ul>
             </div>
 
+            <div style="text-align: center;">
+                <button class="home-btn" onclick="switchView('view-start')">🏠 Übersicht</button>
+            </div>
         </div>
-        
-        <button class="control-btn" onclick="window.location.href='index.html'">ZURÜCK ZUM DASHBOARD</button>
+
     </div>
 
     <script>
+        // Uhrwerk
         function updateClock() {
             const now = new Date();
             document.getElementById('clock').innerText = now.toLocaleTimeString('de-DE', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
         }
         setInterval(updateClock, 1000);
-        updateClock(); // Initialer Aufruf gegen Delay
+        updateClock();
+
+        // Single Page Navigation
+        function switchView(targetId) {
+            // Alle Views ausblenden
+            document.querySelectorAll('.view-section').forEach(el => {
+                el.classList.remove('view-active');
+            });
+            // Ziel-View einblenden
+            document.getElementById(targetId).classList.add('view-active');
+            // Scroll nach oben
+            window.scrollTo(0, 0);
+        }
     </script>
 </body>
 </html>
