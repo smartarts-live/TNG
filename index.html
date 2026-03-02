@@ -19,6 +19,7 @@
             --recovery: #16A085;
             --ppa: #8E44AD;
             --marathon: #D35400;
+            --enpal: #00B0F0; /* NEU: Enpal Blau */
         }
 
         body {
@@ -68,6 +69,11 @@
         .dash-card h3 { margin: 0 0 10px 0; font-size: 1.4rem; }
         .dash-card p { margin: 0 0 20px 0; color: #666; font-size: 0.95rem; line-height: 1.4; flex-grow: 1; }
         .dash-btn { padding: 12px; font-weight: bold; border: none; border-radius: 6px; color: white; cursor: pointer; width: 100%; }
+
+        /* NEUE KLASSEN FÜR ENPAL */
+        .card-enpal { border-color: var(--enpal); }
+        .card-enpal h3 { color: var(--enpal); }
+        .card-enpal .dash-btn { background: var(--enpal); }
 
         .card-wu { border-color: var(--warmup); }
         .card-wu h3 { color: var(--warmup); }
@@ -139,6 +145,14 @@
             
             <div class="dashboard-grid">
                 
+                <div class="dash-card card-enpal" onclick="window.location.href='enpal.html'">
+                    <div>
+                        <h3>☀️ Enpal Spickzettel</h3>
+                        <p>Dein digitaler Leitfaden für das Interview. Argumente für B2B (Handwerk) und B2C (Privatkunden).</p>
+                    </div>
+                    <button class="dash-btn">SPICKZETTEL ÖFFNEN</button>
+                </div>
+
                 <div class="dash-card card-wu" onclick="window.location.href='warm-up.html'">
                     <div>
                         <h3>🧠 Brain Warm-Up</h3>
