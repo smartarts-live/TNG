@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Enpal Spickzettel</title>
+
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='20' fill='%2300B0F0'/><text x='50%' y='50%' font-family='Arial, sans-serif' font-size='50' font-weight='bold' fill='%23FFFFFF' dominant-baseline='central' text-anchor='middle'>CP</text></svg>">
+
+    <style>
+        :root {
+            --primary: #2C3E50;
+            --accent: #E74C3C;
+            --bg: #F8F9FA;
+            --box: #FFFFFF;
+            --text: #333333;
+            --enpal: #00B0F0;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--bg);
+            color: var(--text);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            padding: 20px;
+            user-select: none;
+        }
+
+        .container {
+            background-color: var(--box); width: 100%; max-width: 1000px;
+            padding: 40px; border-radius: 8px; box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            position: relative; text-align: center;
+        }
+
+        h1 { color: var(--enpal); margin-top: 0; margin-bottom: 5px; }
+        .subtitle { color: #666; font-size: 1.1rem; margin-bottom: 30px; }
+
+        .live-clock {
+            position: absolute;
+            top: 35px;
+            right: 40px;
+            font-size: 1.8rem;
+            font-weight: bold;
+            color: var(--primary);
+            font-family: monospace;
+            background: #f0f4f8;
+            padding: 5px 15px;
+            border-radius: 6px;
+            border: 2px solid #e9ecef;
+        }
+
+        .spickzettel-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; text-align: left; }
+        @media (max-width: 768px) { .spickzettel-grid { grid-template-columns: 1fr; } .live-clock { position: relative; top: 0; right: 0; display: inline-block; margin-bottom: 20px; } }
+
+        .spickzettel-box { background: #f8f9fa; border-left: 5px solid; padding: 25px; border-radius: 4px; box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
+        .box-b2b { border-color: #2980B9; }
+        .box-b2c { border-color: #E67E22; }
+        .box-general { border-color: #27AE60; grid-column: 1 / -1; }
+        
+        .spickzettel-box h3 { margin-top: 0; color: var(--primary); border-bottom: 1px solid #ddd; padding-bottom: 10px; font-size: 1.4rem; }
+        .spickzettel-box ul { padding-left: 20px; margin-bottom: 0; }
+        .spickzettel-box li { margin-bottom: 12px; line-height: 1.5; font-size: 1.05rem; }
+
+        button.control-btn { background-color: var(--primary); color: white; font-size: 1.2rem; padding: 15px 40px; border: none; border-radius: 6px; margin-top: 40px; cursor: pointer; font-weight: bold; transition: background 0.2s; }
+        button.control-btn:hover { background-color: #1a252f; }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <div class="live-clock" id="clock">00:00:00</div>
+        
+        <h1>Enpal Interview Strategie</h1>
+        <div class="subtitle">Fokus auf Lösungskompetenz & Abschlussstärke</div>
+
+        <div class="spickzettel-grid">
+            
+            <div class="spickzettel-box box-b2b">
+                <h3>Fokus B2B (Handwerk / Installateure)</h3>
+                <ul>
+                    <li><strong>Mein USP:</strong> "Bauleiter-Versteher" (Bonava Erfahrung). Ich kenne die Pain Points auf dem Bau.</li>
+                    <li><strong>Der Hebel:</strong> Zeitersparnis & weniger Bürokratie für den Installateur betonen.</li>
+                    <li><strong>Vertriebsstil:</strong> Consultative Selling. Ich berate nicht nur, ich "close" (Hunter-Mentalität).</li>
+                    <li><strong>Einwand:</strong> "Never change a running system" -> auflösen durch Aufzeigen von Ineffizienzen.</li>
+                </ul>
+            </div>
+
+            <div class="spickzettel-box box-b2c">
+                <h3>Fokus B2C (Privatkunden / Joker)</h3>
+                <ul>
+                    <li><strong>Mein USP:</strong> "Gastgeber-Gen" (Hotellerie Erfahrung). Empathie bei High-Ticket-Entscheidungen.</li>
+                    <li><strong>Der Hebel:</strong> Vertrauen & Sicherheit vermitteln (Angst vor Technik/Kosten nehmen).</li>
+                    <li><strong>Technik-Fokus:</strong> Komplexe Technik über den reinen Nutzen erklären (Schnittstellen-Erfahrung Bonava).</li>
+                    <li><strong>Einwand:</strong> "Zu teuer" -> in langfristigen Mehrwert übersetzen (Stromkosten einfrieren).</li>
+                </ul>
+            </div>
+
+            <div class="spickzettel-box box-general">
+                <h3>Meine Fragen an Charlotte (Am Ende des Calls)</h3>
+                <ul>
+                    <li>1. "Was unterscheidet euren absolut besten Sales Manager von den durchschnittlichen?"</li>
+                    <li>2. "Was ist aktuell der härteste Einwand der Handwerksbetriebe (bzw. Endkunden)?"</li>
+                    <li>3. <strong>Closing-Move:</strong> "Gibt es basierend auf unserem heutigen Gespräch noch Zweifel an meinem Profil, die ich direkt hier und jetzt ausräumen kann?"</li>
+                </ul>
+            </div>
+
+        </div>
+        
+        <button class="control-btn" onclick="window.location.href='index.html'">ZURÜCK ZUM DASHBOARD</button>
+    </div>
+
+    <script>
+        function updateClock() {
+            const now = new Date();
+            document.getElementById('clock').innerText = now.toLocaleTimeString('de-DE', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+        }
+        setInterval(updateClock, 1000);
+        updateClock(); // Initialer Aufruf gegen Delay
+    </script>
+</body>
+</html>
